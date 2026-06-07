@@ -22,5 +22,7 @@ RUN npm install -g serve
 # Copiamos solo el bundle ya generado
 COPY --from=builder /app/dist ./dist
 
-# Railway asigna un puerto de forma dinámica, nos aseguramos de que Serve escuche ese puerto.
-CMD ["sh", "-c", "serve -s dist -p ${PORT:-5173}"]
+# Railway asigna un puerto dinámico via $PORT.
+# IMPORTANTE: usamos -l tcp://0.0.0.0 para escuchar en todas las interfaces,
+# de lo contrario serve solo escucha en 127.0.0.1 y Railway recibe "connection refused".
+CMD ["sh", "-c", "serve -s dist -l tcp://0.0.0.0:${PORT:-5173}"]
