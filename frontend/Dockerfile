@@ -13,16 +13,14 @@ ARG VITE_API_URL
 ENV VITE_API_URL=$VITE_API_URL
 RUN npm run build
 
-# Imagen final ligera para servir la app
-FROM node:22-alpine
+# Imagen final: nginx alpine para servir el bundle estático
+FROM nginx:alpine
 
-WORKDIR /app
-RUN npm install -g serve
+# Copiamos el bundle compilado
+COPY --from=builder /app/dist /usr/share/nginx/html
 
-# Copiamos solo el bundle ya generado
-COPY --from=builder /app/dist ./dist
+# Configuración nginx: SPA routing + cache de assets
+COPY nginx.conf /etc/nginx/conf.d/default.conf
 
-# Railway asigna un puerto dinámico via $PORT.
-# IMPORTANTE: usamos -l tcp://0.0.0.0 para escuchar en todas las interfaces,
-# de lo contrario serve solo escucha en 127.0.0.1 y Railway recibe "connection refused".
-CMD ["sh", "-c", "serve -s dist -l tcp://0.0.0.0:${PORT:-5173}"]
+EXPOSE 80
+CMD ["nginx", "-g", "daemon off;"]
