@@ -28,11 +28,13 @@ const Dashboard = () => {
   if (loading) return <div className="p-8">Cargando dashboard...</div>;
   if (!stats) return <div className="p-8 text-red-500">Error cargando métricas.</div>;
 
+  const formatCurrency = (value) => new Intl.NumberFormat('es-AR', { style: 'currency', currency: 'ARS' }).format(value);
+
   const statCards = [
-    { title: 'Mes Actual', value: `$${stats.totalThisMonth.toFixed(2)}`, icon: DollarSign, color: 'text-blue-500', bg: 'bg-blue-50' },
-    { title: 'Mes Pasado', value: `$${stats.totalLastMonth.toFixed(2)}`, icon: FileText, color: 'text-slate-500', bg: 'bg-slate-50' },
-    { title: 'Pendiente de Cobro', value: `$${stats.pendingTotal.toFixed(2)}`, icon: Clock, color: 'text-amber-500', bg: 'bg-amber-50' },
-    { title: 'Total Pagado', value: `$${stats.paidTotal.toFixed(2)}`, icon: CheckCircle, color: 'text-emerald-500', bg: 'bg-emerald-50' },
+    { title: 'Mes Actual', value: formatCurrency(stats.totalThisMonth), icon: DollarSign, color: 'text-blue-500', bg: 'bg-blue-50' },
+    { title: 'Mes Pasado', value: formatCurrency(stats.totalLastMonth), icon: FileText, color: 'text-slate-500', bg: 'bg-slate-50' },
+    { title: 'Pendiente de Cobro', value: formatCurrency(stats.pendingTotal), icon: Clock, color: 'text-amber-500', bg: 'bg-amber-50' },
+    { title: 'Total Pagado', value: formatCurrency(stats.paidTotal), icon: CheckCircle, color: 'text-emerald-500', bg: 'bg-emerald-50' },
   ];
 
   return (
@@ -76,10 +78,10 @@ const Dashboard = () => {
                 <div className="relative w-full flex justify-center items-end h-full">
                   <div 
                     className="w-full max-w-[48px] bg-blue-500 rounded-t-md transition-all duration-700 hover:bg-blue-600 cursor-pointer" 
-                    style={{ height: `${heightPercent}%`, minHeight: '4px' }}
+                    style={{ height: `${heightPercent}%`, minHeight: '16px' }}
                   >
                     <div className="opacity-0 group-hover:opacity-100 absolute -top-10 left-1/2 -translate-x-1/2 bg-slate-800 text-white text-xs font-semibold px-2 py-1 rounded shadow-lg whitespace-nowrap transition-opacity pointer-events-none z-10">
-                      ${data.income.toFixed(2)}
+                      {formatCurrency(data.income)}
                       <div className="absolute top-full left-1/2 -translate-x-1/2 border-4 border-transparent border-t-slate-800"></div>
                     </div>
                   </div>

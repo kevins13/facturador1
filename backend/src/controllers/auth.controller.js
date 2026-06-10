@@ -107,11 +107,17 @@ const populate = async (req, res) => {
                 const product = insertedProducts[Math.floor(Math.random() * insertedProducts.length)];
                 const amount = product.price;
 
+                const taxRate = 21;
+                const taxAmount = amount * (taxRate / 100);
+                const totalAmount = amount + taxAmount;
+
                 const inv = await db.insert(invoices).values({
                     clientId: clientId,
                     date: date,
                     status: 'paid',
-                    total: amount,
+                    subtotal: amount,
+                    taxTotal: taxAmount,
+                    total: totalAmount,
                     createdAt: new Date()
                 }).returning({ id: invoices.id });
 
@@ -120,6 +126,8 @@ const populate = async (req, res) => {
                     description: product.name,
                     quantity: 1,
                     price: amount,
+                    taxRate: taxRate,
+                    taxAmount: taxAmount,
                     subtotal: amount
                 });
             }
