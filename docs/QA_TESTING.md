@@ -1415,4 +1415,48 @@ Completar al momento de cierre formal del proyecto
 
 ---
 
-*Documento generado para el proyecto **AuraLink Facturador** — Equipo QA · Versión 1.1*
+## 12. Pruebas de Nuevas Funcionalidades (Avanzadas)
+
+### 12.1 Catálogo de Productos (`/api/products`)
+*   **TC-PROD-001 (API):** `GET /api/products` devuelve array 200 con el catálogo.
+*   **TC-PROD-002 (API):** `POST /api/products` crea un producto validando requerimiento de `name` y `price`.
+*   **TC-PROD-003 (UI):** Navegar a "Catálogo" y crear producto funciona, mostrando el elemento en la tabla.
+*   **TC-PROD-004 (UI):** Al crear una factura, el selector de productos autocompleta descripción y precio en el ítem.
+
+### 12.2 Envío de Correos (`/api/invoices/:id/send`)
+*   **TC-EMAIL-001 (API):** `POST /api/invoices/:id/send` genera PDF en memoria, adjunta a NodeMailer y retorna 200 con `previewUrl` (usando Ethereal).
+*   **TC-EMAIL-002 (UI):** Click en "Enviar por Email" en `InvoiceDetail` arroja alerta de éxito y URL de Ethereal con el correo pre-renderizado.
+
+### 12.3 Roles y Middleware de Autorización (`role` en JWT)
+*   **TC-ROLE-001 (API):** Middleware `isAdmin` devuelve 403 al intentar `DELETE /api/invoices/:id` o `DELETE /api/clients/:id` usando un JWT con rol `SELLER`.
+*   **TC-ROLE-002 (UI):** Iniciar sesión con un usuario vendedor y comprobar que no figure el enlace "Dashboard" ni se listen datos estadísticos.
+
+### 12.4 Presupuestos vs Facturas (`type` de Documento)
+*   **TC-QUOTE-001 (API):** Crear un invoice enviando `type: 'quote'`. El Dashboard (stats) lo ignora.
+*   **TC-QUOTE-002 (API):** Endpoint `PUT /api/invoices/:id/convert` transforma exitosamente de `quote` a `invoice`.
+*   **TC-QUOTE-003 (UI):** En la lista de facturas, las pestañas filtran correctamente. Los presupuestos tienen botón "Convertir a Factura" y una badge especial.
+
+### 12.5 Impuestos y Descuentos
+*   **TC-TAX-001 (API):** Guardar ítems de factura con `taxRate` de 0%, 10.5% o 21%.
+*   **TC-TAX-002 (API):** Enviar un descuento global `discount` válido e integrarlo en la respuesta.
+*   **TC-TAX-003 (UI):** Total en UI (`subtotal` + `taxTotal` - `discount`) coincide matemáticamente con los ítems y refleja en PDF generado.
+
+---
+
+## 13. Resultados de Pruebas en Producción (v1.3)
+
+**Entorno de Pruebas:** Railway (Producción)
+**Fecha:** 2026-06-10
+**Usuario de Acceso Predeterminado:** `admin@auralink.com` / `admin`
+
+### Resumen de incidencias resueltas:
+1. **BUG-CORS:** Solucionado error `ERR_FAILED` por falta de cabecera `Access-Control-Allow-Origin` en backend. Se habilitó dominio dinámico de Railway.
+2. **BUG-MIGRATIONS:** La tabla de base de datos no contenía las columnas de las últimas características (`roles`, `products`). Solucionado inyectando los SQL de migración en producción usando una capa automatizada de migración.
+3. **BUG-UI-MINIFICACION:** Error `TypeError: t is not a function` solucionado reemplazando la librería externa `recharts` con un componente de gráficas de barras nativo usando TailwindCSS.
+4. **FEATURE-DATA-MOCK:** Inyección de 20 clientes reales y transacciones de los últimos 6 meses usando un rango coherente de precios (Catálogo: $30.000 a $40.000) e inclusión automática del IVA (21%).
+
+**Estado General:** 🟢 PRODUCCIÓN ESTABLE
+
+---
+
+*Documento actualizado para el proyecto **AuraLink Facturador** — Equipo QA · Versión 1.3 (Features Avanzados y Producción)*
