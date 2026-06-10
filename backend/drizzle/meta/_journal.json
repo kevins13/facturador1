@@ -8,6 +8,13 @@
       "when": 1776273922049,
       "tag": "0000_round_serpent_society",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1781060573113,
+      "tag": "0001_puzzling_blacklash",
+      "breakpoints": true
     }
   ]
 }
