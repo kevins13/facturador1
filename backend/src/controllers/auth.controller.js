@@ -57,7 +57,7 @@ const populate = async (req, res) => {
 
         // Insert products
         const productData = [
-            { name: 'Aplicación ERP', code: 'APP-ERP', price: 300000, stock: 99 },
+            { name: 'Aplicación ERP', code: 'APP-ERP', price: 30000, stock: 99 },
             { name: 'E-commerce', code: 'ECOMM', price: 40000, stock: 99 },
             { name: 'Bot', code: 'BOT-01', price: 35000, stock: 99 },
             { name: 'Landing Page', code: 'LANDING', price: 30000, stock: 99 },
