@@ -1,7 +1,7 @@
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const db = require('../db');
-const { users, clients, invoices, invoiceItems: invoice_items } = require('../db/schema');
+const { users, clients, invoices, invoiceItems: invoice_items, products } = require('../db/schema');
 const { eq } = require('drizzle-orm');
 
 const login = async (req, res) => {
@@ -49,41 +49,63 @@ const me = async (req, res) => {
 
 const populate = async (req, res) => {
     try {
+        // Clear existing mock data to avoid duplicates
+        await db.delete(invoice_items);
+        await db.delete(invoices);
+        await db.delete(clients);
+        await db.delete(products);
+
+        // Insert products
+        const productData = [
+            { name: 'Aplicación ERP', code: 'APP-ERP', price: 300000, stock: 99 },
+            { name: 'E-commerce', code: 'ECOMM', price: 40000, stock: 99 },
+            { name: 'Bot', code: 'BOT-01', price: 35000, stock: 99 },
+            { name: 'Landing Page', code: 'LANDING', price: 30000, stock: 99 },
+            { name: 'Soporte Técnico', code: 'SOPORTE', price: 35000, stock: 99 }
+        ];
+        
+        const insertedProducts = [];
+        for (const p of productData) {
+            const res = await db.insert(products).values(p).returning({ id: products.id, name: products.name, price: products.price });
+            insertedProducts.push(res[0]);
+        }
+
+        // Realistic client names
+        const clientNames = [
+            'Juan Pérez', 'TechSolutions SRL', 'María Gómez', 'Consultora Integral', 
+            'Carlos Rodríguez', 'Laura Fernández', 'Innovación Digital', 'Agencia Creativa', 
+            'Martín Soler', 'Lucía Blanco', 'Estudio Jurídico López', 'Distribuidora Central', 
+            'Andrés Martínez', 'Sofía Castillo', 'Global Imports', 'Gastronomía Gourmet', 
+            'Diego Herrera', 'Valeria Romero', 'Farmacia del Centro', 'Constructora Moderna'
+        ];
+
         // Create 20 mock clients
         const clientIds = [];
-        for (let i = 1; i <= 20; i++) {
+        for (let i = 0; i < 20; i++) {
             const newClient = await db.insert(clients).values({
-                name: `Cliente Empresa ${i} SA`,
-                email: `contacto${i}@empresa${i}.com`,
+                name: clientNames[i],
+                email: `contacto${i}@dominio.com`,
                 phone: `11223344${i.toString().padStart(2, '0')}`,
-                address: `Av. Siempre Viva ${100 + i}`,
+                address: `Av. Falsa 12${i}`,
                 cuit: `30-12345678-${i % 9}`,
                 createdAt: new Date()
             }).returning({ id: clients.id });
             clientIds.push(newClient[0].id);
         }
 
-        // Generate invoices over the last 6 months to simulate growth
-        // Month 0 (current): 20 clients
-        // Month -1: 19 clients
-        // Month -2: 18 clients
-        // Month -3: 17 clients
-        // Month -4: 16 clients
-        // Month -5: 15 clients
-
-        const amounts = [30000, 35000, 40000];
-
+        // Generate incremental invoices over the last 6 months
         for (let monthOffset = 5; monthOffset >= 0; monthOffset--) {
             const targetClients = 20 - monthOffset;
             
-            // For each of the target clients, create an invoice for this month
             for (let i = 0; i < targetClients; i++) {
                 const clientId = clientIds[i];
                 const date = new Date();
                 date.setMonth(date.getMonth() - monthOffset);
-                date.setDate(Math.floor(Math.random() * 28) + 1); // Random day
+                date.setDate(Math.floor(Math.random() * 28) + 1);
 
-                const amount = amounts[Math.floor(Math.random() * amounts.length)];
+                // Pick a random product
+                const product = insertedProducts[Math.floor(Math.random() * insertedProducts.length)];
+                const amount = product.price;
 
                 const inv = await db.insert(invoices).values({
                     clientId: clientId,
@@ -95,7 +117,7 @@ const populate = async (req, res) => {
 
                 await db.insert(invoice_items).values({
                     invoiceId: inv[0].id,
-                    description: `Servicios Profesionales - Mes ${date.getMonth() + 1}`,
+                    description: product.name,
                     quantity: 1,
                     price: amount,
                     subtotal: amount
@@ -103,7 +125,7 @@ const populate = async (req, res) => {
             }
         }
 
-        res.json({ message: '20 clientes y facturas generados con éxito' });
+        res.json({ message: '20 clientes reales, catálogo de productos y facturas generadas incrementalmente' });
     } catch (error) {
         console.error(error);
         res.status(500).json({ message: 'Error generando datos', details: error.message, stack: error.stack });
