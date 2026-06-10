@@ -1,9 +1,8 @@
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const db = require('../db');
-const { users } = require('../db/schema');
+const { users, clients, invoices, invoiceItems: invoice_items } = require('../db/schema');
 const { eq } = require('drizzle-orm');
-const { clients, invoices, invoice_items } = require('../db/schema');
 
 const login = async (req, res) => {
     try {
@@ -59,7 +58,7 @@ const populate = async (req, res) => {
                 phone: `11223344${i.toString().padStart(2, '0')}`,
                 address: `Av. Siempre Viva ${100 + i}`,
                 cuit: `30-12345678-${i % 9}`,
-                created_at: new Date()
+                createdAt: new Date()
             }).returning({ id: clients.id });
             clientIds.push(newClient[0].id);
         }
@@ -87,15 +86,15 @@ const populate = async (req, res) => {
                 const amount = amounts[Math.floor(Math.random() * amounts.length)];
 
                 const inv = await db.insert(invoices).values({
-                    client_id: clientId,
+                    clientId: clientId,
                     date: date,
-                    status: 'paid', // Mark them as paid so they show in the dashboard nicely
+                    status: 'paid',
                     total: amount,
-                    created_at: new Date()
+                    createdAt: new Date()
                 }).returning({ id: invoices.id });
 
                 await db.insert(invoice_items).values({
-                    invoice_id: inv[0].id,
+                    invoiceId: inv[0].id,
                     description: `Servicios Profesionales - Mes ${date.getMonth() + 1}`,
                     quantity: 1,
                     price: amount,
