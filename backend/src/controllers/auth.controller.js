@@ -106,7 +106,7 @@ const populate = async (req, res) => {
         res.json({ message: '20 clientes y facturas generados con éxito' });
     } catch (error) {
         console.error(error);
-        res.status(500).json({ message: 'Error generando datos' });
+        res.status(500).json({ message: 'Error generando datos', details: error.message, stack: error.stack });
     }
 };
 
