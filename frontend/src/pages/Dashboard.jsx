@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { FileText, DollarSign, Clock, CheckCircle } from 'lucide-react';
-import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid } from 'recharts';
 import api from '../utils/api';
 
 const Dashboard = () => {
@@ -68,19 +67,27 @@ const Dashboard = () => {
 
       <div className="card p-6 border border-slate-100">
         <h3 className="text-lg font-semibold text-slate-800 mb-6">Ingresos (Últimos 6 meses)</h3>
-        <div className="h-80 w-full">
-          <ResponsiveContainer width="100%" height="100%">
-            <BarChart data={stats.chartData} margin={{ top: 10, right: 10, left: 0, bottom: 0 }}>
-              <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f1f5f9" />
-              <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{ fill: '#64748b' }} />
-              <YAxis axisLine={false} tickLine={false} tick={{ fill: '#64748b' }} tickFormatter={(val) => `$${val}`} />
-              <Tooltip 
-                cursor={{ fill: '#f8fafc' }}
-                contentStyle={{ borderRadius: '8px', border: 'none', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' }}
-              />
-              <Bar dataKey="income" fill="#3b82f6" radius={[4, 4, 0, 0]} />
-            </BarChart>
-          </ResponsiveContainer>
+        <div className="h-64 w-full flex items-end justify-between space-x-2 pt-8">
+          {stats.chartData.map((data, idx) => {
+            const maxIncome = Math.max(...stats.chartData.map(d => d.income), 1);
+            const heightPercent = (data.income / maxIncome) * 100;
+            return (
+              <div key={idx} className="flex flex-col items-center flex-1 h-full justify-end group">
+                <div className="relative w-full flex justify-center items-end h-full">
+                  <div 
+                    className="w-full max-w-[48px] bg-blue-500 rounded-t-md transition-all duration-700 hover:bg-blue-600 cursor-pointer" 
+                    style={{ height: `${heightPercent}%`, minHeight: '4px' }}
+                  >
+                    <div className="opacity-0 group-hover:opacity-100 absolute -top-10 left-1/2 -translate-x-1/2 bg-slate-800 text-white text-xs font-semibold px-2 py-1 rounded shadow-lg whitespace-nowrap transition-opacity pointer-events-none z-10">
+                      ${data.income.toFixed(2)}
+                      <div className="absolute top-full left-1/2 -translate-x-1/2 border-4 border-transparent border-t-slate-800"></div>
+                    </div>
+                  </div>
+                </div>
+                <span className="text-sm text-slate-500 mt-3 font-medium">{data.name}</span>
+              </div>
+            );
+          })}
         </div>
       </div>
     </div>
