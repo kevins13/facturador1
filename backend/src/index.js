@@ -19,7 +19,13 @@ const allowedOrigins = process.env.ALLOWED_ORIGINS
 
 app.use(cors({
     origin: (origin, callback) => {
-        if (!origin || allowedOrigins.includes(origin)) return callback(null, true);
+        // Permitir solicitudes sin origen (como Postman o el mismo servidor)
+        if (!origin) return callback(null, true);
+        // Permitir orígenes definidos en ALLOWED_ORIGINS
+        if (allowedOrigins.includes(origin)) return callback(null, true);
+        // Permitir explícitamente cualquier dominio de Railway para el frontend
+        if (origin.endsWith('.up.railway.app')) return callback(null, true);
+
         return callback(new Error('Not allowed by CORS'));
     },
     credentials: true,
