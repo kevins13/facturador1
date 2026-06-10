@@ -70,6 +70,12 @@ const Layout = () => {
           <h2 className="text-xl font-semibold text-slate-800">
             {navLinks.find(link => location.pathname === link.path || (link.path !== '/' && location.pathname.startsWith(link.path)))?.name || ''}
           </h2>
+          {location.pathname !== '/' && (
+            <Link to="/" className="btn-secondary text-sm flex items-center gap-2 py-1.5 px-3">
+              <LayoutDashboard size={16} />
+              Ir al Dashboard
+            </Link>
+          )}
         </header>
         <div className="flex-1 overflow-auto p-8 main-scroll">
           <Outlet />
