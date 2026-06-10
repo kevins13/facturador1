@@ -5,6 +5,16 @@ const users = pgTable('users', {
   id: serial('id').primaryKey(),
   email: varchar('email', { length: 255 }).notNull().unique(),
   password: varchar('password', { length: 255 }).notNull(),
+  role: varchar('role', { length: 50 }).default('SELLER').notNull(),
+  createdAt: timestamp('created_at').defaultNow(),
+});
+
+const products = pgTable('products', {
+  id: serial('id').primaryKey(),
+  name: varchar('name', { length: 255 }).notNull(),
+  code: varchar('code', { length: 100 }),
+  price: doublePrecision('price').notNull(),
+  stock: integer('stock').default(0),
   createdAt: timestamp('created_at').defaultNow(),
 });
 
@@ -22,7 +32,11 @@ const invoices = pgTable('invoices', {
   id: serial('id').primaryKey(),
   clientId: integer('client_id').references(() => clients.id).notNull(),
   date: timestamp('date').defaultNow(),
+  type: varchar('type', { length: 50 }).default('invoice').notNull(), // 'invoice' or 'quote'
   status: varchar('status', { length: 50 }).default('pending'),
+  discount: doublePrecision('discount').default(0),
+  subtotal: doublePrecision('subtotal').default(0),
+  taxTotal: doublePrecision('tax_total').default(0),
   total: doublePrecision('total').notNull(),
   createdAt: timestamp('created_at').defaultNow(),
 });
@@ -33,6 +47,8 @@ const invoiceItems = pgTable('invoice_items', {
   description: varchar('description', { length: 500 }).notNull(),
   quantity: integer('quantity').notNull(),
   price: doublePrecision('price').notNull(),
+  taxRate: doublePrecision('tax_rate').default(0),
+  taxAmount: doublePrecision('tax_amount').default(0),
   subtotal: doublePrecision('subtotal').notNull(),
 });
 
@@ -58,6 +74,7 @@ const clientsRelations = relations(clients, ({ many }) => ({
 
 module.exports = {
   users,
+  products,
   clients,
   invoices,
   invoiceItems,

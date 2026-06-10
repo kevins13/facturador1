@@ -1,7 +1,7 @@
 import React from 'react';
 import { Outlet, Navigate, Link, useLocation } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import { LayoutDashboard, Users, FileText, LogOut } from 'lucide-react';
+import { LayoutDashboard, Users, FileText, LogOut, Package } from 'lucide-react';
 
 const Layout = () => {
   const { user, logout } = useAuth();
@@ -12,10 +12,11 @@ const Layout = () => {
   }
 
   const navLinks = [
-    { name: 'Dashboard', path: '/', icon: LayoutDashboard },
-    { name: 'Clientes', path: '/clients', icon: Users },
-    { name: 'Facturas', path: '/invoices', icon: FileText },
-  ];
+    { name: 'Dashboard', path: '/', icon: LayoutDashboard, roles: ['ADMIN'] },
+    { name: 'Catálogo', path: '/products', icon: Package, roles: ['ADMIN', 'SELLER'] },
+    { name: 'Clientes', path: '/clients', icon: Users, roles: ['ADMIN', 'SELLER'] },
+    { name: 'Facturas', path: '/invoices', icon: FileText, roles: ['ADMIN', 'SELLER'] },
+  ].filter(link => !link.roles || link.roles.includes(user.role || 'ADMIN'));
 
   return (
     <div className="flex h-screen bg-slate-50">

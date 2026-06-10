@@ -8,6 +8,9 @@ import ClientsList from './pages/clients/ClientsList';
 import ClientForm from './pages/clients/ClientForm';
 import InvoicesList from './pages/invoices/InvoicesList';
 import InvoiceForm from './pages/invoices/InvoiceForm';
+import ProductsList from './pages/products/ProductsList';
+import ProductForm from './pages/products/ProductForm';
+
 import InvoiceDetail from './pages/invoices/InvoiceDetail';
 
 function App() {
@@ -23,6 +26,11 @@ function App() {
             <Route path="clients" element={<ClientsList />} />
             <Route path="clients/new" element={<ClientForm />} />
             <Route path="clients/edit/:id" element={<ClientForm />} />
+
+            {/* Productos */}
+            <Route path="products" element={<ProductsList />} />
+            <Route path="products/new" element={<ProductForm />} />
+            <Route path="products/edit/:id" element={<ProductForm />} />
             
             {/* Facturas */}
             <Route path="invoices" element={<InvoicesList />} />

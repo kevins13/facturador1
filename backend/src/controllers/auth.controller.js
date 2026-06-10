@@ -21,12 +21,12 @@ const login = async (req, res) => {
         }
 
         const token = jwt.sign(
-            { id: user.id, email: user.email },
+            { id: user.id, email: user.email, role: user.role },
             process.env.JWT_SECRET || 'secret_token_123',
             { expiresIn: '24h' }
         );
 
-        res.json({ token, user: { id: user.id, email: user.email } });
+        res.json({ token, user: { id: user.id, email: user.email, role: user.role } });
     } catch (error) {
         console.error(error);
         res.status(500).json({ message: 'Error del servidor' });
@@ -35,7 +35,7 @@ const login = async (req, res) => {
 
 const me = async (req, res) => {
     try {
-        const userRes = await db.select({ id: users.id, email: users.email })
+        const userRes = await db.select({ id: users.id, email: users.email, role: users.role })
             .from(users).where(eq(users.id, req.user.id));
             
         if (userRes.length === 0) return res.status(404).json({ message: 'Usuario no encontrado' });
