@@ -54,13 +54,13 @@ const Dashboard = () => {
         {statCards.map((stat, idx) => {
           const Icon = stat.icon;
           return (
-            <div key={idx} className="card flex items-center p-6 space-x-4 hover:shadow-lg transition-shadow border border-slate-100">
-              <div className={`p-4 rounded-xl ${stat.bg} ${stat.color}`}>
+            <div key={idx} className="card flex items-center p-6 min-h-[140px] space-x-4 hover:shadow-lg transition-shadow border border-slate-100">
+              <div className={`p-4 rounded-xl shrink-0 ${stat.bg} ${stat.color}`}>
                 <Icon size={28} strokeWidth={1.5} />
               </div>
-              <div>
+              <div className="min-w-0 flex-1">
                 <p className="text-sm font-medium text-slate-500">{stat.title}</p>
-                <h4 className="text-2xl font-bold text-slate-900">{stat.value}</h4>
+                <h4 className="text-xl xl:text-2xl font-bold text-slate-900 break-words" title={stat.value}>{stat.value}</h4>
               </div>
             </div>
           );
